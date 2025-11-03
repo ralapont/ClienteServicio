@@ -1,0 +1,4 @@
+Accede desde el navegador a estas rutas (por defecto en puerto 8080):
+UI: http://localhost:8083/swagger-ui.html o http://localhost:8080/swagger-ui/index.html
+Spec JSON: http://localhost:8080/v3/api-docs
+Spec YAML: http://localhost:8080/v3/api-docs.yaml (si está habilitado)
