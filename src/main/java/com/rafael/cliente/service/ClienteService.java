@@ -1,6 +1,7 @@
 package com.rafael.cliente.service;
 
-import com.rafael.cliente.dtos.ClienteDTO;
+import com.rafael.cliente.dtos.ClienteRequest;
+import com.rafael.cliente.dtos.ClienteResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -8,12 +9,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ClienteService {
-        ClienteDTO create(ClienteDTO dto);
-        Optional<ClienteDTO> findById(Long id);
-        List<ClienteDTO> findAll();
-        Page<ClienteDTO> findAll(Pageable pageable);
-        ClienteDTO update(Long id, ClienteDTO dto);
-        ClienteDTO partialUpdate(Long id, ClienteDTO dto);
+        ClienteResponse create(ClienteRequest dto, String username);
+        Optional<ClienteResponse> findById(Long id);
+        List<ClienteResponse> findAll();
+        Page<ClienteResponse> findAll(Pageable pageable);
+        ClienteResponse update(Long id, ClienteRequest dto);
+        ClienteResponse partialUpdate(Long id, ClienteRequest dto);
         void deleteById(Long id);
         boolean existsById(Long id);
+        boolean userExists(String username);
 }

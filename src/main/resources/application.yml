@@ -30,5 +30,8 @@ eureka:
     ip-address: 127.0.0.1
     instance-id: ${spring.application.name}:${eureka.instance.ip-address}:${server.port}
 
+auth-service:
+  url: http://localhost:8090
+
 server:
-   port: 8083
+   port: 8093

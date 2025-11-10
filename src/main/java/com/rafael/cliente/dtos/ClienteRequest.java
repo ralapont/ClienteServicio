@@ -1,6 +1,5 @@
 package com.rafael.cliente.dtos;
 
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -12,11 +11,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
-public class ClienteDTO {
-
-    @JsonProperty("id")
-    private Long id;
-
+public class ClienteRequest {
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 50, message = "El nombre no puede tener más de 50 caracteres")
     @JsonProperty("nombre")
@@ -42,8 +37,4 @@ public class ClienteDTO {
     @JsonProperty("email")
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
-    @Size(min = 8, max = 100, message = "La contraseña debe tener al menos 8 caracteres")
-    @JsonProperty(value = "password", access = JsonProperty.Access.WRITE_ONLY)
-    private String password;
 }

@@ -1,6 +1,6 @@
 package com.rafael.cliente.mapper;
 
-import com.rafael.cliente.dtos.ClienteDTO;
+import com.rafael.cliente.dtos.ClienteRequest;
 import com.rafael.cliente.model.entity.Cliente;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
@@ -8,11 +8,11 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring")
-public interface ClienteMapper {
+public interface ClienteRequestMapper {
 
-    Cliente toEntity(ClienteDTO dto);
+    Cliente toEntity(ClienteRequest dto);
 
-    ClienteDTO toDto(Cliente entity);
+    ClienteRequest toDto(Cliente entity);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromDto(ClienteDTO dto, @MappingTarget Cliente entity);
+    void updateEntityFromDto(ClienteRequest dto, @MappingTarget Cliente entity);
 }

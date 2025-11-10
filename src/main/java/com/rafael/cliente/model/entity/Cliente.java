@@ -23,6 +23,6 @@ public class Cliente {
     private String nif;
     private String telefono;
     private String email;
-    private String password;
+    private String username;
 
 }

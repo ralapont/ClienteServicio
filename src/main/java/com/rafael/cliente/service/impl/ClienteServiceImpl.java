@@ -1,15 +1,20 @@
 package com.rafael.cliente.service.impl;
 
-import com.rafael.cliente.dtos.ClienteDTO;
+import com.rafael.cliente.dtos.ClienteRequest;
+import com.rafael.cliente.dtos.ClienteResponse;
 import com.rafael.cliente.exceptionbussines.ClienteNotFoundException;
-import com.rafael.cliente.mapper.ClienteMapper;
+import com.rafael.cliente.feign.AuthServiceClient;
+import com.rafael.cliente.mapper.ClienteRequestMapper;
+import com.rafael.cliente.mapper.ClienteResponseMapper;
 import com.rafael.cliente.model.entity.Cliente;
 import com.rafael.cliente.model.repository.ClienteRepository;
 import com.rafael.cliente.service.ClienteService;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,54 +27,57 @@ import java.util.stream.Collectors;
 public class ClienteServiceImpl implements ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final ClienteMapper clienteMapper;
+    private final ClienteRequestMapper clienteRequestMapper;
+    private final ClienteResponseMapper clienteResponseMapper;
+    private final AuthServiceClient authServiceClient;
 
     @Override
-    public ClienteDTO create(ClienteDTO dto) {
+    public ClienteResponse create(ClienteRequest dto, String username) {
         log.info("Creating new Cliente: {}", dto);
-        Cliente entity = clienteMapper.toEntity(dto);
+        Cliente entity = clienteRequestMapper.toEntity(dto);
+        entity.setUsername(username);
         Cliente saved = clienteRepository.save(entity);
-        return clienteMapper.toDto(saved);
+        return clienteResponseMapper.toDto(saved);
     }
 
     @Override
-    public Optional<ClienteDTO> findById(Long id) {
+    public Optional<ClienteResponse> findById(Long id) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new ClienteNotFoundException(id));
-        return Optional.of(clienteMapper.toDto(cliente));
+        return Optional.of(clienteResponseMapper.toDto(cliente));
     }
 
     @Override
-    public List<ClienteDTO> findAll() {
+    public List<ClienteResponse> findAll() {
         return clienteRepository.findAll()
                 .stream()
-                .map(clienteMapper::toDto)
+                .map(clienteResponseMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Page<ClienteDTO> findAll(Pageable pageable) {
-        return clienteRepository.findAll(pageable).map(clienteMapper::toDto);
+    public Page<ClienteResponse> findAll(Pageable pageable) {
+        return clienteRepository.findAll(pageable).map(clienteResponseMapper::toDto);
     }
 
     @Override
-    public ClienteDTO update(Long id, ClienteDTO dto) {
+    public ClienteResponse update(Long id, ClienteRequest dto) {
         return clienteRepository.findById(id)
                 .map(existing -> {
-                    clienteMapper.updateEntityFromDto(dto, existing);
+                    clienteRequestMapper.updateEntityFromDto(dto, existing);
                     Cliente saved = clienteRepository.save(existing);
-                    return clienteMapper.toDto(saved);
+                    return clienteResponseMapper.toDto(saved);
                 })
                 .orElseThrow(() -> new ClienteNotFoundException(id));
     }
 
     @Override
-    public ClienteDTO partialUpdate(Long id, ClienteDTO dto) {
+    public ClienteResponse partialUpdate(Long id, ClienteRequest dto) {
         return clienteRepository.findById(id)
                 .map(existing -> {
-                    clienteMapper.updateEntityFromDto(dto, existing);
+                    clienteRequestMapper.updateEntityFromDto(dto, existing);
                     Cliente saved = clienteRepository.save(existing);
-                    return clienteMapper.toDto(saved);
+                    return clienteResponseMapper.toDto(saved);
                 })
                 .orElseThrow(() -> new ClienteNotFoundException(id));
     }
@@ -86,4 +94,19 @@ public class ClienteServiceImpl implements ClienteService {
     public boolean existsById(Long id) {
         return clienteRepository.existsById(id);
     }
+
+    @Override
+    public boolean userExists(String username) {
+        try {
+            ResponseEntity<Void> response = authServiceClient.checkUserExists(username);
+            return response.getStatusCode().is2xxSuccessful();
+        } catch (FeignException.NotFound e) {
+            return false;
+        } catch (FeignException e) {
+            // manejar otros errores si es necesario
+            log.info("Error al verificar usuario: {}", e.getMessage());
+            throw new RuntimeException("Error al verificar usuario", e);
+        }
+    }
+
 }
