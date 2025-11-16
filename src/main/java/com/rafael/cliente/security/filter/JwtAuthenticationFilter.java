@@ -6,6 +6,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,9 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final String secretKey = "mi_clave_secreta";
+    private final String secretKey = "TuClaveSecretaSuperSegura1234567890";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -28,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+            log.info("Token recibido: {}", token);
 
             Claims claims = JwtUtil.parseToken(token);
 
@@ -43,6 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     }
                 }
             }
+
+            log.info("Usuario: {}, Roles: {}", username, roles);
 
             List<GrantedAuthority> authorities = roles.stream()
                     .map(SimpleGrantedAuthority::new)
